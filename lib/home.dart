@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'api.dart';
 
@@ -12,12 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Api api = Api();
-
-  @override
-  void initState() {
-    super.initState();
-    api.getGifs().then((gifs) => print(gifs));
-  }
+  String _search = "";
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +21,8 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         centerTitle: true,
-        title: Image.network("https://developers.giphy.com/static/img/dev-logo-lg.7404c00322a8.gif"),
+        title: Image.network(
+            "https://developers.giphy.com/static/img/dev-logo-lg.7404c00322a8.gif"),
       ),
       backgroundColor: Colors.black,
       body: Padding(
@@ -34,15 +31,66 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             TextField(
               decoration: InputDecoration(
-                labelText: "Pesquise aqui",
-                labelStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder()
-              ),
+                  labelText: "Pesquise aqui",
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder()),
               style: TextStyle(color: Colors.white, fontSize: 18.0),
+              onSubmitted: (text) {
+                setState(() {
+                  _search = text;
+                });
+              },
+            ),
+            Divider(),
+            Expanded(
+              child: FutureBuilder(
+                future: _search.isEmpty ? api.getGifs() : api.searchGifs(_search),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return Container(
+                        width: 200.0,
+                        height: 200.0,
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(
+                            valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white),
+                            strokeWidth: 5.0),
+                      );
+                    default:
+                      if (snapshot.hasError)
+                        return Container();
+                      else {
+                        print(snapshot.data);
+                        return _createGrid(context, snapshot);
+                      }
+                  }
+                },
+              ),
             )
           ],
         ),
       ),
+    );
+  }
+
+  Widget _createGrid(context, snapshot) {
+    return GridView.builder(
+      padding: EdgeInsets.all(16.0),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
+          crossAxisCount: 2
+      ),
+      itemCount: snapshot.data["data"].length,
+      itemBuilder: (context, index) {
+        return Image.network(
+            snapshot.data["data"][index]["images"]["fixed_height"]["url"],
+            height: 300.0,
+            fit: BoxFit.cover
+        );
+      },
     );
   }
 }
