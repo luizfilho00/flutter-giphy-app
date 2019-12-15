@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'api.dart';
 
@@ -13,6 +14,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Api api = Api();
+  String appBarImgUrl =
+      "https://developers.giphy.com/static/img/dev-logo-lg.7404c00322a8.gif";
   String _search = "";
 
   @override
@@ -21,8 +24,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         centerTitle: true,
-        title: Image.network(
-            "https://developers.giphy.com/static/img/dev-logo-lg.7404c00322a8.gif"),
+        title: Image.network(appBarImgUrl),
       ),
       backgroundColor: Colors.black,
       body: Padding(
@@ -44,7 +46,8 @@ class _HomePageState extends State<HomePage> {
             Divider(),
             Expanded(
               child: FutureBuilder(
-                future: _search.isEmpty ? api.getGifs() : api.searchGifs(_search),
+                future:
+                    _search.isEmpty ? api.getGifs() : api.searchGifs(_search),
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
@@ -55,16 +58,14 @@ class _HomePageState extends State<HomePage> {
                         alignment: Alignment.center,
                         child: CircularProgressIndicator(
                             valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white),
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                             strokeWidth: 5.0),
                       );
                     default:
                       if (snapshot.hasError)
                         return Container();
-                      else {
-                        print(snapshot.data);
+                      else
                         return _createGrid(context, snapshot);
-                      }
                   }
                 },
               ),
@@ -79,17 +80,14 @@ class _HomePageState extends State<HomePage> {
     return GridView.builder(
       padding: EdgeInsets.all(16.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-          crossAxisCount: 2
-      ),
+          mainAxisSpacing: 8.0, crossAxisSpacing: 8.0, crossAxisCount: 2),
       itemCount: snapshot.data["data"].length,
       itemBuilder: (context, index) {
-        return Image.network(
-            snapshot.data["data"][index]["images"]["fixed_height"]["url"],
+        return FadeInImage.memoryNetwork(
+            placeholder: kTransparentImage,
+            image: snapshot.data["data"][index]["images"]["fixed_height"]["url"],
             height: 300.0,
-            fit: BoxFit.cover
-        );
+            fit: BoxFit.cover);
       },
     );
   }
