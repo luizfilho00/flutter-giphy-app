@@ -42,8 +42,12 @@ class _HomePageState extends BaseState {
               decoration: InputDecoration(
                   labelText: "Pesquise aqui",
                   labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder()),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white))),
               style: TextStyle(color: Colors.white, fontSize: 18.0),
+              cursorColor: Colors.white,
               onSubmitted: (text) =>
                   _homeBloc.inputSearch.add(SubmitEvent(text)),
             ),
@@ -86,18 +90,23 @@ class _HomePageState extends BaseState {
   }
 
   Widget _createGrid(BuildContext context, List<Gif> gifs) {
-    return GridView.builder(
-      padding: EdgeInsets.all(16.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          mainAxisSpacing: 8.0, crossAxisSpacing: 8.0, crossAxisCount: 2),
-      itemCount: gifs.length,
-      itemBuilder: (context, index) {
-        return FadeInImage.memoryNetwork(
-            placeholder: kTransparentImage,
-            image: gifs[index].url,
-            height: 300.0,
-            fit: BoxFit.cover);
-      },
-    );
+    if (gifs.isEmpty)
+      return Center(
+          child: Text("Nenhum gif encontrado :(",
+              style: TextStyle(color: Colors.white, fontSize: 18.0)));
+    else
+      return GridView.builder(
+        padding: EdgeInsets.all(16.0),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            mainAxisSpacing: 8.0, crossAxisSpacing: 8.0, crossAxisCount: 2),
+        itemCount: gifs.length,
+        itemBuilder: (context, index) {
+          return FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: gifs[index].url,
+              height: 300.0,
+              fit: BoxFit.cover);
+        },
+      );
   }
 }
