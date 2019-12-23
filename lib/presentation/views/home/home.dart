@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:mymovies/domain/entity/gif.dart';
+import 'package:mymovies/presentation/utils/api_response.dart';
 import 'package:mymovies/presentation/views/home/bloc/home_bloc.dart';
+import 'package:mymovies/presentation/views/home/events/text_event.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatefulWidget {
@@ -36,27 +38,29 @@ class _HomePageState extends State<HomePage> {
                   labelStyle: TextStyle(color: Colors.white),
                   border: OutlineInputBorder()),
               style: TextStyle(color: Colors.white, fontSize: 18.0),
-              onSubmitted: (text) => _homeBloc.inputSearch.add(text),
+              onSubmitted: (text) =>
+                  _homeBloc.inputSearch.add(SubmitEvent(text)),
             ),
             Divider(),
             Expanded(
-              child: StreamBuilder(
+              child: StreamBuilder<ApiResponse>(
                 stream: _homeBloc.gifs,
                 builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return Container(
-                        width: 200.0,
-                        height: 200.0,
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                            strokeWidth: 5.0),
-                      );
-                    default:
-                      if (snapshot.hasError)
+                  if (snapshot.hasData)
+                    switch (snapshot.data.status) {
+                      case Status.LOADING:
+                        return Container(
+                          width: 200.0,
+                          height: 200.0,
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              strokeWidth: 5.0),
+                        );
+                      case Status.COMPLETED:
+                        return _createGrid(context, snapshot.data.data);
+                      case Status.ERROR:
                         return Center(
                           child: Text(
                             "Nennhuma imagem disponível :(",
@@ -64,9 +68,8 @@ class _HomePageState extends State<HomePage> {
                                 TextStyle(fontSize: 18.0, color: Colors.white),
                           ),
                         );
-                      else
-                        return _createGrid(context, snapshot.data);
-                  }
+                    }
+                  return Container();
                 },
               ),
             )
