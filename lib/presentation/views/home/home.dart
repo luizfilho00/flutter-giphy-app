@@ -1,9 +1,8 @@
-import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:mymovies/domain/entity/gif.dart';
-import 'package:mymovies/presentation/home/bloc/home_bloc.dart';
+import 'package:mymovies/presentation/views/home/bloc/home_bloc.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String appBarImgUrl =
       "https://developers.giphy.com/static/img/dev-logo-lg.7404c00322a8.gif";
-  HomeBloc _homeBloc = BlocProvider.getBloc<HomeBloc>();
+  HomeBloc _homeBloc = HomeBloc();
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +41,7 @@ class _HomePageState extends State<HomePage> {
             Divider(),
             Expanded(
               child: StreamBuilder(
-                stream: _homeBloc.gifsUrl,
+                stream: _homeBloc.gifs,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
@@ -91,5 +90,11 @@ class _HomePageState extends State<HomePage> {
             fit: BoxFit.cover);
       },
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _homeBloc.dispose();
   }
 }
