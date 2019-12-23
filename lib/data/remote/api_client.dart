@@ -9,7 +9,7 @@ class ApiClient {
 
   Future<ApiGifResponse> getGifs() async {
     Response response = await dio.get("trending",
-        queryParameters: {"api_key": apiKey, "limit": 100, "rating": "G"});
+        queryParameters: {"api_key": apiKey, "limit": 26, "rating": "G"});
     return ApiGifResponse.fromJson(response.data);
   }
 
@@ -17,7 +17,7 @@ class ApiClient {
     Response response = await dio.get("search", queryParameters: {
       "q": text,
       "api_key": apiKey,
-      "limit": 100,
+      "limit": 26,
       "rating": "G",
       "lang": "en"
     });
