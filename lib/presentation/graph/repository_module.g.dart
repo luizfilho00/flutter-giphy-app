@@ -11,5 +11,7 @@ class _$RepositoryModule extends RepositoryModule {
     final Container container = Container();
     container.registerFactory<GifRepository, DefaultGifRepository>(
         (c) => DefaultGifRepository(c<ApiClient>()));
+    container.registerFactory<FakeRepository, DefaultFakeRepository>(
+        (c) => DefaultFakeRepository(c<ApiClient>()));
   }
 }

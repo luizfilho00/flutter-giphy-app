@@ -1,6 +1,8 @@
 import 'package:kiwi/kiwi.dart';
 import 'package:mymovies/data/remote/api_client.dart';
+import 'package:mymovies/data/repository/default_fake_repository.dart';
 import 'package:mymovies/data/repository/default_gif_repository.dart';
+import 'package:mymovies/domain/boundary/fake_repository.dart';
 import 'package:mymovies/domain/boundary/gif_repository.dart';
 import 'package:mymovies/presentation/graph/injector.dart';
 
@@ -15,5 +17,6 @@ abstract class RepositoryModule {
   }
 
   @Register.factory(GifRepository, from: DefaultGifRepository)
+  @Register.factory(FakeRepository, from: DefaultFakeRepository)
   void _configure();
 }
