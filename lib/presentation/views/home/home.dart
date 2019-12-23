@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:mymovies/domain/entity/gif.dart';
+import 'package:mymovies/presentation/base/base_stateful_state.dart';
 import 'package:mymovies/presentation/utils/api_response.dart';
 import 'package:mymovies/presentation/views/home/bloc/home_bloc.dart';
 import 'package:mymovies/presentation/views/home/events/text_event.dart';
@@ -9,15 +10,20 @@ import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
+  _HomePageState createState() {
     return _HomePageState();
   }
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends BaseState {
   String appBarImgUrl =
       "https://developers.giphy.com/static/img/dev-logo-lg.7404c00322a8.gif";
-  HomeBloc _homeBloc = HomeBloc();
+  HomeBloc _homeBloc;
+
+  _HomePageState() {
+    _homeBloc = HomeBloc();
+    super.blocs = [_homeBloc];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                       case Status.ERROR:
                         return Center(
                           child: Text(
-                            "Nennhuma imagem disponível :(",
+                            snapshot.data.message,
                             style:
                                 TextStyle(fontSize: 18.0, color: Colors.white),
                           ),
@@ -93,11 +99,5 @@ class _HomePageState extends State<HomePage> {
             fit: BoxFit.cover);
       },
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _homeBloc.dispose();
   }
 }
