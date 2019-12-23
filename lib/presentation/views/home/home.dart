@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:mymovies/domain/entity/gif.dart';
 import 'package:mymovies/presentation/base/base_stateful_state.dart';
 import 'package:mymovies/presentation/utils/api_response.dart';
+import 'package:mymovies/presentation/views/details/gif_details.dart';
 import 'package:mymovies/presentation/views/home/bloc/home_bloc.dart';
 import 'package:mymovies/presentation/views/home/events/text_event.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -42,6 +43,8 @@ class _HomePageState extends BaseState {
               decoration: InputDecoration(
                   labelText: "Pesquise aqui",
                   labelStyle: TextStyle(color: Colors.white),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
                   border: OutlineInputBorder(
@@ -101,11 +104,17 @@ class _HomePageState extends BaseState {
             mainAxisSpacing: 8.0, crossAxisSpacing: 8.0, crossAxisCount: 2),
         itemCount: gifs.length,
         itemBuilder: (context, index) {
-          return FadeInImage.memoryNetwork(
-              placeholder: kTransparentImage,
-              image: gifs[index].url,
-              height: 300.0,
-              fit: BoxFit.cover);
+          return GestureDetector(
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GifDetails(gifs[index]))),
+            child: FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: gifs[index].url,
+                height: 300.0,
+                fit: BoxFit.cover),
+          );
         },
       );
   }

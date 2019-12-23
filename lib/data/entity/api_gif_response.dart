@@ -15,6 +15,8 @@ class ApiGifResponse {
     }
   }
 
-  List<Gif> toGifList() =>
-      data.map((data) => Gif(data.image.apiFixedHeight.url)).toList();
+  List<Gif> toGifList() => data
+      .map((data) =>
+          Gif(data.image.apiFixedHeight.url, data.image.apiOriginalSize.url))
+      .toList();
 }
