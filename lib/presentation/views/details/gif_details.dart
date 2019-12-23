@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mymovies/domain/entity/gif.dart';
 import 'package:share/share.dart';
@@ -22,6 +23,13 @@ class GifDetails extends StatelessWidget {
         ),
         body: Padding(
             padding: EdgeInsets.all(8.0),
-            child: Center(child: Image.network(gif.originalSizeUrl))));
+            child: Center(
+                child: CachedNetworkImage(
+              imageUrl: gif.originalSizeUrl,
+              placeholder: (context, url) => CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ))));
   }
 }

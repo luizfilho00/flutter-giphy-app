@@ -27,6 +27,7 @@ dependencies:
   dio: ^3.0.7
   kiwi: ^0.2.0
   share: ^0.6.3+5
+  cached_network_image: ^2.0.0-rc
 
 dev_dependencies:
   flutter_test:
