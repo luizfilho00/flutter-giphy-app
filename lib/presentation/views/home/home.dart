@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:mymovies/domain/entity/gif.dart';
 import 'package:mymovies/presentation/base/base_stateful_state.dart';
-import 'package:mymovies/presentation/utils/api_response.dart';
 import 'package:mymovies/presentation/views/details/gif_details.dart';
 import 'package:mymovies/presentation/views/home/bloc/home_bloc.dart';
 import 'package:mymovies/presentation/views/home/events/text_event.dart';
+import 'package:mymovies/presentation/views/shared/styles/input_text_styles.dart';
+import 'package:mymovies/presentation/views/shared/widgets/default_stream_builder.dart';
+import 'package:mymovies/presentation/views/shared/widgets/material_input_text.dart';
+import 'package:mymovies/presentation/views/shared/widgets/text_not_found_gifs.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatefulWidget {
@@ -39,51 +42,17 @@ class _HomePageState extends BaseState {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: <Widget>[
-            TextField(
-              decoration: InputDecoration(
-                  labelText: "Pesquise aqui",
-                  labelStyle: TextStyle(color: Colors.white),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white))),
-              style: TextStyle(color: Colors.white, fontSize: 18.0),
-              cursorColor: Colors.white,
-              onSubmitted: (text) =>
-                  _homeBloc.inputSearch.add(SubmitEvent(text)),
+            MaterialInputText(
+              hint: "Buscar GIFs",
+              onSubmitted: (text) => _homeBloc.inputSearch.add(SubmitEvent(text)),
+              style: WhiteTextSize18(),
             ),
             Divider(),
             Expanded(
-              child: StreamBuilder<ApiResponse>(
-                stream: _homeBloc.gifs,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData)
-                    switch (snapshot.data.status) {
-                      case Status.LOADING:
-                        return Container(
-                          width: 200.0,
-                          height: 200.0,
-                          alignment: Alignment.center,
-                          child: CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                              strokeWidth: 5.0),
-                        );
-                      case Status.COMPLETED:
-                        return _createGrid(context, snapshot.data.data);
-                      case Status.ERROR:
-                        return Center(
-                          child: Text(
-                            snapshot.data.message,
-                            style:
-                                TextStyle(fontSize: 18.0, color: Colors.white),
-                          ),
-                        );
-                    }
-                  return Container();
-                },
+              child: DefaultStreamBuilder(
+                _homeBloc.gifs,
+                successAction: _createGrid,
+                defaultEmptyPlaceholder: TextNotFoundGifs(),
               ),
             )
           ],
@@ -94,9 +63,7 @@ class _HomePageState extends BaseState {
 
   Widget _createGrid(BuildContext context, List<Gif> gifs) {
     if (gifs.isEmpty)
-      return Center(
-          child: Text("Nenhum gif encontrado :(",
-              style: TextStyle(color: Colors.white, fontSize: 18.0)));
+      return TextNotFoundGifs();
     else
       return GridView.builder(
         padding: EdgeInsets.all(16.0),

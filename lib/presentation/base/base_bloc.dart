@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:mymovies/presentation/utils/api_response.dart';
+import 'package:mymovies/presentation/utils/async_data.dart';
 
 abstract class BaseBloc {
   void launchDataLoad<T>(StreamController stream, Function function) async {
-    stream.add(ApiResponse<T>.loading());
+    stream.add(AsyncData<T>.loading());
     try {
-      stream.add(ApiResponse<T>.completed(await function()));
+      stream.add(AsyncData<T>.completed(await function()));
     } catch (e) {
-      stream.add(ApiResponse<T>.error(e.toString()));
+      stream.add(AsyncData<T>.error(e.toString()));
     }
   }
 

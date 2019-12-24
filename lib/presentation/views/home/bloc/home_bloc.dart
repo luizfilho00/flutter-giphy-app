@@ -1,31 +1,34 @@
 import 'dart:async';
-import 'package:mymovies/domain/boundary/gif_repository.dart';
+
 import 'package:mymovies/domain/entity/gif.dart';
+import 'package:mymovies/domain/interactor/get_gifs.dart';
 import 'package:mymovies/presentation/base/base_bloc.dart';
-import 'package:mymovies/presentation/graph/injector.dart';
-import 'package:mymovies/presentation/utils/api_response.dart';
+import 'package:mymovies/presentation/utils/async_data.dart';
 import 'package:mymovies/presentation/views/home/events/text_event.dart';
 
 class HomeBloc extends BaseBloc {
   Sink<TextEvent> get inputSearch => _searchStream.sink;
-  Stream<ApiResponse<List<Gif>>> get gifs => _gifs.stream;
 
-  StreamController<ApiResponse<List<Gif>>> _gifs = StreamController.broadcast();
+  Stream<AsyncData<List<Gif>>> get gifs => _gifs.stream;
+
+  StreamController<AsyncData<List<Gif>>> _gifs = StreamController.broadcast();
   StreamController<TextEvent> _searchStream = StreamController.broadcast();
-  GifRepository _repository = Injector.inject<GifRepository>();
+  GetGifs _getGifs = GetGifs();
 
   HomeBloc() {
     _searchStream.stream.listen(_handleEvents);
-    launchDataLoad<List<Gif>>(_gifs, _repository.loadTrendingGifs);
+    loadTrendingGifs();
   }
+
+  void loadTrendingGifs() =>
+      launchDataLoad<List<Gif>>(_gifs, _getGifs.trending);
 
   void _handleEvents(TextEvent event) async {
     if (event is SubmitEvent) {
       if (event.text.trim().isEmpty)
-        launchDataLoad<List<Gif>>(_gifs, _repository.loadTrendingGifs);
+        launchDataLoad<List<Gif>>(_gifs, _getGifs.trending);
       else
-        launchDataLoad<List<Gif>>(
-            _gifs, () => _repository.searchGifs(event.text));
+        launchDataLoad<List<Gif>>(_gifs, () => _getGifs.search(event.text));
     }
   }
 
